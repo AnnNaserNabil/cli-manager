@@ -6,20 +6,32 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import GooglePalmEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
-from langchain_google_generativeai import GoogleGenerativeAI
+from google.generativeai import generate_text
+
+# Initialize Google AI
+load_dotenv()
+
+def get_llm():
+    return generate_text(
+        model=os.getenv('GOOGLE_PALM_MODEL'),
+        api_key=os.getenv('GOOGLE_API_KEY')
+    )
+
+# Create embeddings model
+embeddings_model = GooglePalmEmbeddings(
+    model=os.getenv('GOOGLE_PALM_MODEL')
+)
 
 class ResearchAgent:
-    def __init__(self, data_dir: str = "data", embeddings_model: str = "text-embedding-3-small"):
+    def __init__(self, data_dir: str = "data"):
         """
         Initialize the research agent with document storage and retrieval capabilities.
         
         Args:
             data_dir: Directory to store research documents
-            embeddings_model: Model to use for text embeddings
         """
-        load_dotenv()
         self.data_dir = data_dir
-        self.embeddings = GooglePalmEmbeddings(model="gemini-2-flash")
+        self.embeddings = embeddings_model
         self.db = None
         
     def ingest_documents(self, documents_dir: str):
@@ -59,9 +71,8 @@ class ResearchAgent:
             
         # Create retrieval chain
         retriever = self.db.as_retriever(search_kwargs={"k": k})
-        llm = GoogleGenerativeAI(model="gemini-2.0-flash")
         qa_chain = RetrievalQA.from_chain_type(
-            llm=llm,
+            llm=get_llm(),
             chain_type="stuff",
             retriever=retriever
         )
