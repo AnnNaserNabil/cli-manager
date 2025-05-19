@@ -3,10 +3,10 @@ from typing import List, Optional
 from dotenv import load_dotenv
 from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings
+from langchain.embeddings import GooglePalmEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatGooglePalm
 
 class ResearchAgent:
     def __init__(self, data_dir: str = "data", embeddings_model: str = "text-embedding-3-small"):
@@ -19,7 +19,7 @@ class ResearchAgent:
         """
         load_dotenv()
         self.data_dir = data_dir
-        self.embeddings = OpenAIEmbeddings(model=embeddings_model)
+        self.embeddings = GooglePalmEmbeddings(model="gemini-pro")
         self.db = None
         
     def ingest_documents(self, documents_dir: str):
@@ -59,7 +59,7 @@ class ResearchAgent:
             
         # Create retrieval chain
         retriever = self.db.as_retriever(search_kwargs={"k": k})
-        llm = ChatOpenAI(temperature=0.7)
+        llm = ChatGooglePalm(temperature=0.7)
         qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="stuff",
