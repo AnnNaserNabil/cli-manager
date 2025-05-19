@@ -6,7 +6,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import GooglePalmEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
-from langchain.chat_models import ChatGooglePalm
+from langchain_google_generativeai import GoogleGenerativeAI
 
 class ResearchAgent:
     def __init__(self, data_dir: str = "data", embeddings_model: str = "text-embedding-3-small"):
@@ -19,7 +19,7 @@ class ResearchAgent:
         """
         load_dotenv()
         self.data_dir = data_dir
-        self.embeddings = GooglePalmEmbeddings(model="gemini-pro")
+        self.embeddings = GooglePalmEmbeddings(model="gemini-2-flash")
         self.db = None
         
     def ingest_documents(self, documents_dir: str):
@@ -59,7 +59,7 @@ class ResearchAgent:
             
         # Create retrieval chain
         retriever = self.db.as_retriever(search_kwargs={"k": k})
-        llm = ChatGooglePalm(temperature=0.7)
+        llm = GoogleGenerativeAI(model="gemini-2.0-flash")
         qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="stuff",

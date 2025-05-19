@@ -24,7 +24,7 @@ pip install -r requirements.txt
 
 3. Set the model to use in a `.env` file:
 ```
-GOOGLE_PALM_MODEL=gemini-pro
+GOOGLE_PALM_MODEL=gemini-2-flash
 ```
 
 ## Usage
